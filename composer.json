@@ -10,5 +10,10 @@
             "name": "Addvilz",
             "email": "mrtreinis@gmail.com"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-0": {
+            "": "src/"
+        }
+    }
 }
