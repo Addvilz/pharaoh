@@ -1,0 +1,14 @@
+{
+    "name": "addvilz/pharaoh",
+    "description": "Library to simplify .phar build scripts",
+    "require": {
+        "symfony/finder": "^2.6"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Addvilz",
+            "email": "mrtreinis@gmail.com"
+        }
+    ]
+}
