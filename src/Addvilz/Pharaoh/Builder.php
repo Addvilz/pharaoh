@@ -99,7 +99,7 @@ class Builder
     {
         if (null === $phar) {
             if ($this->stdOut) {
-                echo 'Creating Phar using default settings';
+                echo 'Creating Phar using default settings' . PHP_EOL;
             }
             $phar = $this->createDefaultPhar();
         }
@@ -122,7 +122,7 @@ class Builder
         $phar->compressFiles(\Phar::GZ);
 
         if ($this->stdOut) {
-            echo 'Done!';
+            echo 'Done!' . PHP_EOL;
         }
 
         return $this;
@@ -135,7 +135,7 @@ class Builder
     private function addFileToPhar($filePath, \Phar $phar)
     {
         if ($this->stdOut) {
-            echo sprintf('Adding file "%s"', $filePath);
+            echo sprintf('Adding file "%s"', $filePath) . PHP_EOL;
         }
 
         $path = str_replace(
