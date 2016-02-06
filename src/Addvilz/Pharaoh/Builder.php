@@ -22,6 +22,11 @@ class Builder
     private $rootPath;
 
     /**
+     * @var bool
+     */
+    private $stdOut;
+
+    /**
      * @var Finder
      */
     private $finders;
@@ -32,11 +37,12 @@ class Builder
     private $files;
 
     /**
-     * @param $pharName
-     * @param $destinationPath
-     * @param $rootPath
+     * @param string $pharName
+     * @param string $destinationPath
+     * @param string $rootPath
+     * @param bool   $stdOut
      */
-    public function __construct($pharName, $destinationPath, $rootPath)
+    public function __construct($pharName, $destinationPath, $rootPath, $stdOut = true)
     {
         if (empty($pharName)) {
             throw new \InvalidArgumentException('Argument $pharName can not be empty');
@@ -53,20 +59,24 @@ class Builder
         $this->pharName = $pharName;
         $this->destinationPath = $destinationPath;
         $this->rootPath = $rootPath;
+        $this->stdOut = $stdOut;
     }
 
     /**
      * @param Finder $finder
+     *
      * @return $this
      */
     public function addFinder(Finder $finder)
     {
         $this->finders[] = $finder;
+
         return $this;
     }
 
     /**
      * @param string $path
+     *
      * @return $this
      */
     public function addFile($path)
@@ -75,17 +85,22 @@ class Builder
             throw new \InvalidArgumentException('Argument $path can not be empty');
         }
         $this->files[] = $path;
+
         return $this;
     }
 
     /**
-     * @param string $indexFilePath
+     * @param string     $indexFilePath
      * @param \Phar|null $phar
+     *
      * @return $this
      */
     public function build($indexFilePath, \Phar $phar = null)
     {
         if (null === $phar) {
+            if ($this->stdOut) {
+                echo 'Creating Phar using default settings';
+            }
             $phar = $this->createDefaultPhar();
         }
         $phar->startBuffering();
@@ -106,6 +121,10 @@ class Builder
         $phar->stopBuffering();
         $phar->compressFiles(\Phar::GZ);
 
+        if ($this->stdOut) {
+            echo 'Done!';
+        }
+
         return $this;
     }
 
@@ -115,9 +134,12 @@ class Builder
      */
     private function addFileToPhar($filePath, \Phar $phar)
     {
+        if ($this->stdOut) {
+            echo sprintf('Adding file "%s"', $filePath);
+        }
 
         $path = str_replace(
-            rtrim($this->rootPath, '/') . DIRECTORY_SEPARATOR,
+            rtrim($this->rootPath, '/').DIRECTORY_SEPARATOR,
             '',
             (new \SplFileInfo($filePath))->getRealPath()
         );
@@ -157,7 +179,7 @@ EOF
     }
 
     /**
-     * @param \Phar $phar
+     * @param \Phar  $phar
      * @param string $indexFilePath
      */
     private function addIndex(\Phar $phar, $indexFilePath)
