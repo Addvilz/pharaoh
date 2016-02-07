@@ -92,14 +92,15 @@ class Builder
     /**
      * @param string     $indexFilePath
      * @param \Phar|null $phar
+     * @param mixed      $build         Build number. Available as constant __PHARAOH_BUILD__
      *
      * @return $this
      */
-    public function build($indexFilePath, \Phar $phar = null)
+    public function build($indexFilePath, \Phar $phar = null, $build = 'dev')
     {
         if (null === $phar) {
             if ($this->stdOut) {
-                echo 'Creating Phar using default settings' . PHP_EOL;
+                echo 'Creating Phar using default settings'.PHP_EOL;
             }
             $phar = $this->createDefaultPhar();
         }
@@ -117,12 +118,12 @@ class Builder
 
         $this->addIndex($phar, $indexFilePath);
 
-        $this->addStub($phar);
+        $this->addStub($phar, $build);
         $phar->stopBuffering();
         $phar->compressFiles(\Phar::GZ);
 
         if ($this->stdOut) {
-            echo 'Done!' . PHP_EOL;
+            echo 'Done!'.PHP_EOL;
         }
 
         return $this;
@@ -135,7 +136,7 @@ class Builder
     private function addFileToPhar($filePath, \Phar $phar)
     {
         if ($this->stdOut) {
-            echo sprintf('Adding file "%s"', $filePath) . PHP_EOL;
+            echo sprintf('Adding file "%s"', $filePath).PHP_EOL;
         }
 
         $path = str_replace(
@@ -165,12 +166,18 @@ class Builder
 
     /**
      * @param \Phar $phar
+     * @param mixed $build
      */
-    private function addStub(\Phar $phar)
+    private function addStub(\Phar $phar, $build)
     {
+        if (!is_scalar($build)) {
+            $build = json_encode($build);
+        }
+
         $phar->setStub(<<<EOF
 #!/usr/bin/env php
 <?php
+define('__PHARAOH_BUILD__', '$build');
 Phar::mapPhar('$this->pharName');
 require 'phar://$this->pharName/__app_index';
 __HALT_COMPILER();
